@@ -4,31 +4,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
-import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
-
 
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
 
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
-                .authorizeExchange(exchanges -> exchanges
-                        .anyExchange().authenticated() // Todas las solicitudes deben estar autenticadas
-                )
-                .oauth2Login(oauth2Login -> oauth2Login
-                        .authenticationSuccessHandler(authenticationSuccessHandler()) // Configura el manejador de éxito
-                )
-                .csrf(ServerHttpSecurity.CsrfSpec::disable); // Deshabilita CSRF
+                .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt())  // Resource Server con JWT
+                .csrf(ServerHttpSecurity.CsrfSpec::disable);
 
         return http.build();
-    }
-
-    @Bean
-    public ServerAuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new RedirectServerAuthenticationSuccessHandler("/home"); // Redirige a "/home" después de la autenticación
     }
 }
 
